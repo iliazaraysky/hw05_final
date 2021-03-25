@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %} Подписки пользователя {% endblock %}
+
+{% block content %}
+    <div class="container">
+           {% include "menu.html" with index=True %}
+           <h1> Последние обновления авторов</h1>
+            <!-- Вывод ленты записей -->
+                {% load cache %}
+                {% cache 20 index_page %}
+                    {% for post in page %}
+                      <!-- Вот он, новый include! -->
+
+                        {% include "post_item.html" with post=post %}
+
+                    {% endfor %}
+                {% endcache %}
+    </div>
+
+        <!-- Вывод паджинатора -->
+        {% if page.has_other_pages %}
+            {% include "paginator.html" with items=page paginator=paginator%}
+        {% endif %}
+
+{% endblock %}

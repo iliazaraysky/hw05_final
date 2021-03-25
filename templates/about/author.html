@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block header %}Об авторе проекта{% endblock %}
+{% block content %}
+{% load user_filters %}
+  <main role="main" class="container">
+    <div class="row">
+      <!-- Левый вспомогательный блок -->
+      <div class="col-md-3 mb-3 mt-1">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="h3">
+                    <i class="fab fa-affiliatetheme"></i>
+                    <i class="fab fa-accusoft"></i>
+                    <i class="fab fa-github-alt"></i>
+                    <i class="fab fa-gulp"></i>
+                    <i class="fab fa-yandex"></i>
+                </div> 
+              </li>
+              <li class="list-group-item">
+                <div class="h6 text-muted">
+                  <p>Полезный короткий текст</p>
+                   <a href="https://github.com/iliazaraysky">Тут должен быть логотип из FontAwesome. Тот, что для GitHub. Но, он упорно не хотел отображаться</a>
+                </div>
+              </li>
+            </ul>                                               
+          </div>                    
+        </div>                
+      </div>
+      <!-- Тело страницы -->
+      <div class="col-md-9">
+        <div class="card-body">                    
+          <div class="card-text">
+              <p>Здравствуйте! Меня зовут <b>Илья</b>. Я пока не программист, я учусь в Яндекс Практикуме, мне нравится - это весело.</p>
+              <p>Кстати, этот проект - <b>Yatube</b>. Аналогов в интернете не найти. Я в него вложил все свои знания, получилось почти на миллион (да вы и сами это видите).</p>
+              <p>Да, сайт пока не на хостинге. Но, как только произойдет выпуск проекта в продакшн. Уф, я продам его сразу компании Google, а может и Яндекс (тут уж победит тот, кто больше предложит)</p>
+              {% load static %}
+              <img class="rounded mx-auto d-block" src=""  width="300">
+          </div>
+        </div>
+      </div>
+      <div class="row featurette">
+         <div class="col-md-7">
+           <h2 class="featurette-heading">P.S. Это картинка моих джойстиков от PS4 <span class="text-muted"> , они в пыли, и пусть дальше пылятся, покуда Яндекс Практикум не будет завершен!</span></h2>
+         </div>
+         <div class="col-md-5">
+           <img class="featurette-image img-fluid mx-auto" src="{% static 'you_wanna_play_let_s_play.jpg' %}" alt="https://gph.is/g/amnjn5Q">
+         </div>
+      </div>
+      <hr class="featurette-divider">
+
+      <div class="row featurette">
+          <div class="col-md-7 order-md-2">
+            <h2 class="featurette-heading">Ах, да! Почему я продам этот проект? Ну вот ответ. <span class="text-muted">У меня есть кот, но он не помогает мне в работе, живет своей жизнью, часто спит рядом с холодильником</span></h2>
+            <p class="lead">(<i>У меня просто нет шансов устроиться в нормальную компанию</i>)</p>
+          </div>
+          <div class="col-md-5 order-md-1">
+            <img class="featurette-image img-fluid mx-auto" src="{% static 'cat.jpg' %}" alt="mycat.jpg">
+          </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+

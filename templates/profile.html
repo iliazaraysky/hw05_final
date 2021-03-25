@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% block title %}Профиль пользователя {{ author.first_name }} {{ author.last_name }}{% endblock %}
+{% block header %}Профиль пользователя {{ author.first_name }} {{ author.last_name }}{% endblock %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                    <div class="card">
+                            <div class="card-body">
+                                    <div class="h2">
+                                        {{ author.first_name }} {{ author.last_name }}
+                                    </div>
+                                    <div class="h3 text-muted">
+                                         <!-- username автора -->
+                                         @{{ author.username }}
+                                    </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                            <div class="h6 text-muted">
+                                            Подписчиков: XXX <br />
+                                            Подписан: XXX
+                                            </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                            <div class="h6 text-muted">
+                                                <!-- Количество записей -->
+                                                Записей: {{ counter }}
+                                            </div>
+                                    </li>
+                            </ul>
+                    </div>
+            </div>
+
+            <div class="col-md-9">
+                {% for post in page %}
+                <!-- Начало блока с отдельным постом -->
+                {% include 'post_item.html' %}
+                <!-- Конец блока с отдельным постом -->
+                {% endfor %}
+                <!-- Остальные посты -->
+                {% include "paginator.html" %}
+                <!-- Здесь постраничная навигация паджинатора -->
+     </div>
+    </div>
+</main>
+{% endblock content %}
