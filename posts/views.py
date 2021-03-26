@@ -114,8 +114,8 @@ def server_error(request):
 
 @login_required
 def follow_index(request):
-    latest = Post.objects.all()
-    paginator = Paginator(latest, 10)
+    post_list_follow = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(post_list_follow, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return render(request, "follow.html",
@@ -124,9 +124,11 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    # ...
-    pass
+    to_follow = get_object_or_404(User, username=username)
 
+    if request.user.username == username:
+        return redirect("profile", username=username)
+    Follow.objects.create(user=request.user, author=to_follow)
 
 @login_required
 def profile_unfollow(request, username):

@@ -2,12 +2,12 @@
 <div class="row">
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link {% if index %}active{% endif %}" href="{% url 'index' %}">
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">
                   Все авторы
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if follow %}active{% endif %}" href="{% url 'follow_index' %}">
+            <a class="nav-link {% if 'follow' in request.path %}active{% endif %}" href="{% url 'follow_index' %}">
                 Избранные авторы
             </a>
         </li>
