@@ -7,7 +7,7 @@ from django import forms
 from django.conf import settings
 import random, tempfile, shutil
 
-from posts.models import Group, Post
+from posts.models import Group, Post, Follow
 
 User = get_user_model()
 
@@ -210,3 +210,60 @@ class ProjectViewsTests(TestCase):
         after_clearing_the_cache = response.content
         self.assertNotEqual(before_clearing_the_cache,
                             after_clearing_the_cache)
+
+    def test_login_user_follow_and_unfollow(self):
+        """
+        Авторизованный пользователь может подписываться
+        на других пользователей, а также отписываться
+        """
+        self.new_user = User.objects.create_user(username='TonyStark')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.new_user)
+        followers_before = len(
+            Follow.objects.all().filter(author_id=self.author.id))
+
+        # User follow
+        self.authorized_client.get(
+            reverse('profile_follow', args=[self.author]))
+        followers_after = len(
+            Follow.objects.all().filter(author_id=self.author.id))
+        self.assertEqual(followers_after, followers_before + 1)
+
+        # User unfollow
+        self.authorized_client.get(
+            reverse('profile_unfollow', args=[self.author]))
+        followers_after_unfollow = len(
+            Follow.objects.all().filter(author_id=self.author.id))
+        self.assertEqual(followers_after_unfollow, followers_before)
+
+    def test_follow_index(self):
+        """
+        Новая запись пользователя появляется в ленте тех,
+        кто на него подписан и не появляется в ленте тех,
+        кто не подписан на него
+        """
+        self.new_user = User.objects.create_user(username='TonyStark')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.new_user)
+
+        response = self.authorized_client.get(reverse('follow_index'))
+
+        self.authorized_client.get(
+            reverse('profile_follow', args=[self.author]))
+
+        response_after_follow = self.authorized_client.get(
+            reverse('follow_index'))
+
+        self.assertNotEqual(response.content, response_after_follow.content)
+
+    def test_add_comment_not_login_user(self):
+        """
+        Проверка доступа анонимного пользователя
+        к редактированию поста
+        """
+        lst_id = Post.objects.filter(author=self.author).values_list('id',
+                                                                     flat=True)
+        url = reverse('add_comment', args=[self.author.username,
+                                           random.choice(lst_id)])
+        response = self.guest_client.get(url, follow=True)
+        self.assertRedirects(response, '/auth/login/?next=' + url)
