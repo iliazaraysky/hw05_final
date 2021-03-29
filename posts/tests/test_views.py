@@ -5,7 +5,9 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django import forms
 from django.conf import settings
-import random, tempfile, shutil
+import random
+import tempfile
+import shutil
 
 from posts.models import Group, Post, Follow
 
@@ -199,7 +201,7 @@ class ProjectViewsTests(TestCase):
         response = self.authorized_client.get(reverse('index'))
         before_clearing_the_cache = response.content
 
-        post = Post.objects.create(
+        Post.objects.create(
             group=ProjectViewsTests.group,
             text="Новый текст, после кэша",
             author=User.objects.get(username='authorForPosts'))

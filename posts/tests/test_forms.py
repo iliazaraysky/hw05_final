@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from posts.forms import PostForm
-from posts.models import Group, Post, Comment
+from posts.models import Group, Post
 
 import random
 
