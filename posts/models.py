@@ -42,11 +42,18 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                             related_name='comments')
+                             related_name='comments', verbose_name='Пост',
+                             help_text='Под каким постом оставлен комментарий')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name='comments')
-    text = models.TextField()
-    created = models.DateTimeField("Дата публикации", auto_now_add=True)
+                               related_name='comments',
+                               verbose_name='Автор комментария',
+                               help_text='Автор отображается на сайте')
+    text = models.TextField(verbose_name='Текст комментария',
+                            help_text='Обязательное поле,\
+                             не должно быть пустым')
+    created = models.DateTimeField(verbose_name="Дата публикации",
+                                   help_text='Дата публикации',
+                                   auto_now_add=True)
 
     def __str__(self):
         return self.text
