@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
 from django.shortcuts import redirect
+from http import HTTPStatus
 
 
 def index(request):
@@ -11,7 +12,7 @@ def index(request):
     paginator = Paginator(latest, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "index.html", {"page": page})
+    return render(request, 'index.html', {'page': page})
 
 
 def group_posts(request, slug):
@@ -20,8 +21,8 @@ def group_posts(request, slug):
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "group.html",
-                  {"group": group, "posts": posts, "page": page})
+    return render(request, 'group.html',
+                  {'group': group, 'posts': posts, 'page': page})
 
 
 @login_required
@@ -87,13 +88,14 @@ def post_view(request, username, post_id):
 def add_comment(request, username, post_id):
     post = get_object_or_404(Post, id=post_id, author__username=username)
     form = CommentForm(request.POST or None)
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.post = post
-        comment.author = request.user
-        comment.save()
-        return redirect('post', username=post.author, post_id=post.id)
-    return redirect('post', username=post.author.username, post_id=post_id)
+
+    if not form.is_valid():
+        return redirect('post', username=post.author.username, post_id=post_id)
+    comment = form.save(commit=False)
+    comment.post = post
+    comment.author = request.user
+    comment.save()
+    return redirect('post', username=post.author, post_id=post.id)
 
 
 @login_required
@@ -115,14 +117,14 @@ def post_edit(request, username, post_id):
 def page_not_found(request, exception):
     return render(
         request,
-        "misc/404.html",
-        {"path": request.path},
-        status=404
+        'misc/404.html',
+        {'path': request.path},
+        status=HTTPStatus.NOT_FOUND
     )
 
 
 def server_error(request):
-    return render(request, "misc/500.html", status=500)
+    return render(request, 'misc/500.html', status=500)
 
 
 @login_required
@@ -132,7 +134,7 @@ def follow_index(request):
     paginator = Paginator(post_list_follow, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "follow.html",
+    return render(request, 'follow.html',
                   {'page': page, 'paginator': paginator})
 
 
@@ -142,11 +144,11 @@ def profile_follow(request, username):
     already = Follow.objects.filter(user=request.user, author=follow).exists()
 
     if request.user.username == username:
-        return redirect("profile", username=username)
+        return redirect('profile', username=username)
 
     if not already:
-        Follow.objects.create(user=request.user, author=follow)
-    return redirect("profile", username=username)
+        Follow.objects.get_or_create(user=request.user, author=follow)
+    return redirect('profile', username=username)
 
 
 @login_required
@@ -154,4 +156,4 @@ def profile_unfollow(request, username):
     following = get_object_or_404(User, username=username)
     follower = get_object_or_404(Follow, author=following, user=request.user)
     follower.delete()
-    return redirect("profile", username=username)
+    return redirect('profile', username=username)

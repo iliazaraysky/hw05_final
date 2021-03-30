@@ -1,61 +1,22 @@
 {% extends "base.html" %}
 {% load thumbnail %}
-{% block title %}Профиль пользователя {{ author.first_name }} {{ author.last_name }}{% endblock %}
-{% block header %}Профиль пользователя {{ author.first_name }} {{ author.last_name }}{% endblock %}
+{% block title %}Профиль пользователя {{ author.first_name }}
+    {{ author.last_name }}{% endblock %}
+{% block header %}Профиль пользователя {{ author.first_name }}
+    {{ author.last_name }}{% endblock %}
 {% block content %}
-<main role="main" class="container">
-    <div class="row">
-            <div class="col-md-3 mb-3 mt-1">
-                    <div class="card">
-                            <div class="card-body">
-                                    <div class="h2">
-                                        {{ author.first_name }} {{ author.last_name }}
-                                    </div>
-                                    <div class="h3 text-muted">
-                                         <!-- username автора -->
-                                         @{{ author.username }}
-                                    </div>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                            <div class="h6 text-muted">
-                                            Подписчиков: {{ count_following }} <br />
-                                            Подписан: {{ count_follower }}
-                                            </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                            <div class="h6 text-muted">
-                                                <!-- Количество записей -->
-                                                Записей: {{ counter }}
-                                            </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        {% if following %}
-                                        <a class="btn btn-lg btn-light"
-                                                href="{% url 'profile_unfollow' author.username %}" role="button">
-                                                Отписаться
-                                        </a>
-                                        {% else %}
-                                        <a class="btn btn-lg btn-primary"
-                                                href="{% url 'profile_follow' author.username %}" role="button">
-                                        Подписаться
-                                        </a>
-                                        {% endif %}
-                                    </li>
-                            </ul>
-                    </div>
-            </div>
-
+    <main role="main" class="container">
+        <div class="row">
+            {% include 'include/profile_follower_counter.html' %}
             <div class="col-md-9">
                 {% for post in page %}
-                <!-- Начало блока с отдельным постом -->
-                {% include 'post_item.html' %}
-                <!-- Конец блока с отдельным постом -->
+
+                    {% include 'include/post_item.html' %}
+
                 {% endfor %}
-                <!-- Остальные посты -->
-                {% include "paginator.html" %}
-                <!-- Здесь постраничная навигация паджинатора -->
-     </div>
-    </div>
-</main>
+
+                {% include "include/paginator.html" %}
+            </div>
+        </div>
+    </main>
 {% endblock content %}

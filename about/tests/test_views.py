@@ -18,8 +18,8 @@ class TestProjectModels(TestCase):
         использует соответствующий шаблон
         """
         templates_page_names = {
-            'about/author.html': reverse('about:author'),
-            'about/tech.html': reverse('about:tech'),
+            'author.html': reverse('about:author'),
+            'tech.html': reverse('about:tech'),
         }
         for template, reverse_name in templates_page_names.items():
             with self.subTest(template=template):

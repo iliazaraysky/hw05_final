@@ -1,6 +1,9 @@
 from django.urls import path
-
+from django.conf.urls import handler404, handler500
 from . import views
+
+handler404 = "posts.views.page_not_found"  # noqa
+handler500 = "posts.views.server_error"  # noqa
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -17,6 +20,4 @@ urlpatterns = [
          name="profile_follow"),
     path("<str:username>/unfollow/", views.profile_unfollow,
          name="profile_unfollow"),
-    path("404", views.page_not_found, name='404'),
-    path("500", views.server_error, name='500'),
 ]

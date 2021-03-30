@@ -9,7 +9,7 @@ import random
 import tempfile
 import shutil
 
-from posts.models import Group, Post, Follow
+from posts.models import Group, Post, Follow, Comment
 
 User = get_user_model()
 
@@ -53,8 +53,7 @@ class ProjectViewsTests(TestCase):
             text="Какой-то там текст",
             author=User.objects.get(username='authorForPosts'),
             image=uploaded
-            )
-
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -272,7 +271,7 @@ class ProjectViewsTests(TestCase):
     def test_add_comment_not_login_user(self):
         """
         Проверка доступа анонимного пользователя
-        к редактированию поста
+        к добавлению комментария
         """
         lst_id = Post.objects.filter(author=self.author).values_list('id',
                                                                      flat=True)
@@ -281,9 +280,27 @@ class ProjectViewsTests(TestCase):
         response = self.guest_client.get(url, follow=True)
         self.assertRedirects(response, '/auth/login/?next=' + url)
 
-    # def test_add_comment_login_user(self):
-    #     lst_id = Post.objects.filter(author=self.author).values_list('id',
-    #                                                                  flat=True)
-    #     url = reverse('add_comment', args=[self.author.username,
-    #                                        random.choice(lst_id)])
-    #     response = self.guest_client.get(url, follow=True)
+    def test_add_comment_login_user(self):
+        """
+        Проверка доступа зарегистрированного пользователя
+        к добавлению комментария
+        """
+        self.new_user = User.objects.create_user(username='TonyStark')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.new_user)
+
+        lst_id = Post.objects.filter(author=self.author).values_list('id',
+                                                                     flat=True)
+        random_url_data = random.choice(lst_id)
+        form_data = {
+            'text': 'Полностью разделяю позицию автора. Отличная работа!'
+                    'Хорошо написано. Я бы также написал',
+        }
+
+        self.authorized_client.post(reverse('add_comment',
+                                            args=[self.author.username,
+                                                  random_url_data]),
+                                    data=form_data, follow=True)
+        last_comment = \
+        Comment.objects.filter(author__username='TonyStark').order_by('-id')[0]
+        self.assertEqual(form_data['text'], last_comment.text)

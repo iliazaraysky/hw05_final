@@ -9,11 +9,9 @@
                 <div class="card">
                         <div class="card-body">
                                 <div class="h2">
-                                    <!-- Имя автора -->
                                     {{ full_post.author.first_name }} {{ full_post.author.last_name }}
                                 </div>
                                 <div class="h3 text-muted">
-                                     <!-- username автора -->
                                      @{{ full_post.author }}
                                 </div>
                         </div>
@@ -26,22 +24,21 @@
                                 </li>
                                 <li class="list-group-item">
                                         <div class="h6 text-muted">
-                                            <!--Количество записей -->
                                             Записей: {{ counter }}
                                         </div>
                                 </li>
 
                                 <li class="list-group-item">
                                         {% if following %}
-                                        <a class="btn btn-lg btn-light"
-                                                href="{% url 'profile_unfollow' author.username %}" role="button">
-                                                Отписаться
-                                        </a>
+                                            <a class="btn btn-lg btn-light"
+                                                    href="{% url 'profile_unfollow' author.username %}" role="button">
+                                                    Отписаться
+                                            </a>
                                         {% else %}
-                                        <a class="btn btn-lg btn-primary"
-                                                href="{% url 'profile_follow' author.username %}" role="button">
-                                        Подписаться
-                                        </a>
+                                            <a class="btn btn-lg btn-primary"
+                                                    href="{% url 'profile_follow' author.username %}" role="button">
+                                            Подписаться
+                                            </a>
                                         {% endif %}
                                 </li>
                         </ul>
@@ -49,10 +46,11 @@
         </div>
 
         <div class="col-md-9">
-            <!-- Пост -->
-            {% include 'post_item.html' %}
-            {% include 'comments.html' %}
-         </div>
+
+            {% include 'include/post_item.html' %}
+            {% include 'include/comments.html' %}
+
+        </div>
     </div>
 </main>
 {% endblock content %}
