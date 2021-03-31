@@ -50,7 +50,7 @@ class ProjectViewsTests(TestCase):
 
         cls.post = Post.objects.create(
             group=ProjectViewsTests.group,
-            text="Какой-то там текст",
+            text='Какой-то там текст',
             author=User.objects.get(username='authorForPosts'),
             image=uploaded
         )
@@ -65,6 +65,9 @@ class ProjectViewsTests(TestCase):
         self.user = User.objects.create_user(username='TestForTest')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.new_user = User.objects.create_user(username='TonyStark')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.new_user)
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон"""
@@ -140,43 +143,33 @@ class ProjectViewsTests(TestCase):
         response = self.authorized_client.get(url)
         post = response.context['post']
         author = response.context['author']
-        post_text = post.text
-        post_author = author.first_name
-        post_image = post.image
-        self.assertEqual(post_author, 'Тестов')
-        self.assertEqual(post_text, 'Какой-то там текст')
-        self.assertEqual(post_image, post.image.name)
+        self.assertEqual(author.first_name, 'Тестов')
+        self.assertEqual(post.text, 'Какой-то там текст')
+        self.assertEqual(post.image, post.image.name)
 
     def test_home_page_show_correct_context(self):
         """Пост отображается на главной странице"""
         response = self.authorized_client.get(reverse('index'))
         first_object = response.context['page'][0]
-        post_text = first_object.text
-        post_group = first_object.group.title
-        post_image = first_object.image
-        self.assertEqual(post_text, 'Какой-то там текст')
-        self.assertEqual(post_group, 'Лев Толстой')
-        self.assertEqual(post_image, self.post.image.name)
+        self.assertEqual(first_object.text, 'Какой-то там текст')
+        self.assertEqual(first_object.group.title, 'Лев Толстой')
+        self.assertEqual(first_object.image, self.post.image.name)
 
     def test_group_page_show_correct_context(self):
         """Пост отображается на странице группы"""
-
         response = self.authorized_client.get(
             reverse('group', args=[self.group.slug]))
         first_object = response.context['posts'][0]
-        post_text = first_object.text
-        post_group = first_object.group.title
-        post_image = first_object.image
-        self.assertEqual(post_text, 'Какой-то там текст')
-        self.assertEqual(post_group, 'Лев Толстой')
-        self.assertEqual(post_image, self.post.image.name)
+        self.assertEqual(first_object.text, 'Какой-то там текст')
+        self.assertEqual(first_object.group.title, 'Лев Толстой')
+        self.assertEqual(first_object.image, self.post.image.name)
 
     def test_first_page_containse_ten_records(self):
         """Колличество постов на первой странице равно 10"""
         for i in range(1, 14):
             self.post_first_page = Post.objects.create(
                 group=ProjectViewsTests.group,
-                text="Какой-то там текст",
+                text='Какой-то там текст',
                 author=User.objects.get(username='authorForPosts'),
             )
         response = self.client.get(reverse('index'))
@@ -186,11 +179,10 @@ class ProjectViewsTests(TestCase):
         for i in range(1, 14):
             self.post_second_page = Post.objects.create(
                 group=ProjectViewsTests.group,
-                text="Какой-то там текст",
+                text='Какой-то там текст',
                 author=User.objects.get(username='authorForPosts'),
             )
-
-        response = self.guest_client.get(reverse('index') + '?page=2')
+        response = self.guest_client.get(reverse('index'), {'page': 2})
         self.assertEqual(len(response.context.get('page').object_list), 4)
 
     def test_cach_in_index_page(self):
@@ -200,7 +192,7 @@ class ProjectViewsTests(TestCase):
 
         Post.objects.create(
             group=ProjectViewsTests.group,
-            text="Новый текст, после кэша",
+            text='Новый текст, после кэша',
             author=User.objects.get(username='authorForPosts'))
 
         cache.clear()
@@ -215,9 +207,6 @@ class ProjectViewsTests(TestCase):
         Авторизованный пользователь может подписываться
         на других пользователей
         """
-        self.new_user = User.objects.create_user(username='TonyStark')
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.new_user)
         followers_before = len(
             Follow.objects.all().filter(author_id=self.author.id))
 
@@ -232,10 +221,6 @@ class ProjectViewsTests(TestCase):
         Авторизованный пользователь может подписываться
         на других пользователей, а также отписываться
         """
-        self.new_user = User.objects.create_user(username='TonyStark')
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.new_user)
-
         followers_before = len(
             Follow.objects.all().filter(author_id=self.author.id))
 
@@ -254,10 +239,6 @@ class ProjectViewsTests(TestCase):
         кто на него подписан и не появляется в ленте тех,
         кто не подписан на него
         """
-        self.new_user = User.objects.create_user(username='TonyStark')
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.new_user)
-
         response = self.authorized_client.get(reverse('follow_index'))
 
         self.authorized_client.get(
@@ -271,7 +252,7 @@ class ProjectViewsTests(TestCase):
     def test_add_comment_not_login_user(self):
         """
         Проверка доступа анонимного пользователя
-        к добавлению комментария
+        к редактированию поста
         """
         lst_id = Post.objects.filter(author=self.author).values_list('id',
                                                                      flat=True)
@@ -285,10 +266,6 @@ class ProjectViewsTests(TestCase):
         Проверка доступа зарегистрированного пользователя
         к добавлению комментария
         """
-        self.new_user = User.objects.create_user(username='TonyStark')
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.new_user)
-
         lst_id = Post.objects.filter(author=self.author).values_list('id',
                                                                      flat=True)
         random_url_data = random.choice(lst_id)
@@ -296,11 +273,11 @@ class ProjectViewsTests(TestCase):
             'text': 'Полностью разделяю позицию автора. Отличная работа!'
                     'Хорошо написано. Я бы также написал',
         }
-
         self.authorized_client.post(reverse('add_comment',
                                             args=[self.author.username,
                                                   random_url_data]),
                                     data=form_data, follow=True)
         last_comment = \
-        Comment.objects.filter(author__username='TonyStark').order_by('-id')[0]
+            Comment.objects.filter(author__username='TonyStark').order_by(
+                '-id')[0]
         self.assertEqual(form_data['text'], last_comment.text)

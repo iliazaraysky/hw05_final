@@ -28,7 +28,7 @@ class StaticURLTests(TestCase):
         for i in range(1, 5):
             cls.post = Post.objects.create(
                 group=StaticURLTests.group,
-                text="Какой-то там текст",
+                text='Какой-то там текст',
                 author=User.objects.get(username='authorForPosts')
             )
 

@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from django.urls import reverse
-import random
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -28,7 +26,7 @@ class StaticURLTests(TestCase):
         for i in range(1, 5):
             cls.post = Post.objects.create(
                 group=StaticURLTests.group,
-                text="Какой-то там текст",
+                text='Какой-то там текст',
                 author=User.objects.get(username='authorForPosts')
             )
 
@@ -53,7 +51,7 @@ class StaticURLTests(TestCase):
         Проверка доступности анонимным пользователем,
         страницы профиля пользователя
         """
-        url = "/testfortest/"
+        url = '/testfortest/'
         response = self.guest_client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
 
@@ -62,7 +60,7 @@ class StaticURLTests(TestCase):
         Проверка доступности анонимным пользователем,
         страницы с постом автора
         """
-        response = self.guest_client.get("/testfortest/4/", follow=True)
+        response = self.guest_client.get('/testfortest/4/', follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_anon_username_edit_post_url(self):

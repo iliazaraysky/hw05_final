@@ -25,7 +25,7 @@ class TestProjectModels(TestCase):
 
         cls.post = Post.objects.create(
             group=TestProjectModels.group,
-            text="Какой то там текст",
+            text='Какой то там текст',
         )
 
         cls.comment = Comment.objects.create(

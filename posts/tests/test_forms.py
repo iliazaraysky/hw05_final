@@ -5,8 +5,6 @@ from django.urls import reverse
 from posts.forms import PostForm
 from posts.models import Group, Post
 
-import random
-
 User = get_user_model()
 
 
