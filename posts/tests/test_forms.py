@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from posts.forms import PostForm
+from posts.forms import PostForm, CommentForm
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -39,6 +39,12 @@ class TestCreateForm(TestCase):
         self.user = User.objects.create_user(username='TestForTest')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+
+    def test_comment_form_valid(self):
+        """Проверяем форму комментариев"""
+        form_data = {'text': 'Очередной хвалебный комментарий!'}
+        form = CommentForm(data=form_data)
+        self.assertTrue(form.is_valid())
 
     def test_form_create(self):
         """Проверка создания нового поста, авторизированным пользователем"""

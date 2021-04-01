@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from http import HTTPStatus
 from django.test import TestCase, Client
 from posts.models import Group, Post
 
@@ -44,7 +45,7 @@ class StaticURLTests(TestCase):
         url_list = ['/', '/group/tolstoy/']
         for test_url in url_list:
             response = self.guest_client.get(test_url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_response_anon_username_url(self):
         """
@@ -53,7 +54,7 @@ class StaticURLTests(TestCase):
         """
         url = '/testfortest/'
         response = self.guest_client.get(url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_response_anon_username_post_url(self):
         """
@@ -61,7 +62,7 @@ class StaticURLTests(TestCase):
         страницы с постом автора
         """
         response = self.guest_client.get('/testfortest/4/', follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_anon_username_edit_post_url(self):
         """
@@ -81,7 +82,7 @@ class StaticURLTests(TestCase):
         self.authorized_client.force_login(self.author)
 
         response = self.authorized_client.get('/testfortest/4/edit/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_not_author_username_edit_post_url(self):
         """
@@ -90,17 +91,17 @@ class StaticURLTests(TestCase):
         """
         response = self.authorized_client.get('/testfortest/4/edit/',
                                               follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_new_page_not_login_user(self):
         """Страница доступна авторизированному пользователю"""
         response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_group_slug_response_not_login_user(self):
         """Проверка доступности созданной группы для всех пользователей"""
         response = self.guest_client.get('/group/tolstoy/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_new_page_not_login_user(self):
         """
@@ -108,13 +109,13 @@ class StaticURLTests(TestCase):
         перенаправляет анонимного пользователя
         """
         response = self.guest_client.get('/new')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_new_page_login_user(self):
         """Главная страница доступна авторизированному пользователю"""
 
         response = self.authorized_client.get('/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_group_slug_response_login_user(self):
         """
@@ -122,13 +123,13 @@ class StaticURLTests(TestCase):
         для авторизированных пользователей
         """
         response = self.authorized_client.get('/group/tolstoy/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_new_page_login_user(self):
         """Страница доступна авторизированному пользователю"""
 
         response = self.authorized_client.get('/new')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_new_page_not_login_user_redirect(self):
         """Страница перенаправляет анонимного пользователя"""
@@ -175,11 +176,11 @@ class StaticURLTests(TestCase):
         for exist in urls_exist:
             with self.subTest():
                 response = self.authorized_client.get(exist)
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_404_response_code(self):
         """
         Если страница не найдена на сайте, возвращает код ответа 404
         """
         response = self.guest_client.get('/testfortest/0/', follow=True)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)

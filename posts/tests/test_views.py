@@ -69,6 +69,7 @@ class ProjectViewsTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.new_user)
 
+
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон"""
 
@@ -97,18 +98,17 @@ class ProjectViewsTests(TestCase):
                 form_fields = response.context['form'].fields[value]
                 self.assertIsInstance(form_fields, expected)
 
+    def check_post_context(self, post):
+        self.assertEqual(post.author.first_name, 'Тестов')
+        self.assertEqual(post.text, 'Какой-то там текст')
+        self.assertEqual(post.image, self.post.image.name)
+
     def test_context_in_profile(self):
         """Проверка содержимого словаря context для /<username>/"""
         url = reverse('profile', args=[self.author.username])
         response = self.authorized_client.get(url)
         post = response.context['page'][0]
-        author = response.context['author']
-        post_text = post.text
-        post_author = author.first_name
-        post_image = post.image
-        self.assertEqual(post_author, 'Тестов')
-        self.assertEqual(post_text, 'Какой-то там текст')
-        self.assertEqual(post_image, self.post.image.name)
+        self.check_post_context(post)
 
     def test_context_in_post_edit(self):
         """
@@ -118,10 +118,8 @@ class ProjectViewsTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.author)
 
-        lst_id = Post.objects.filter(author=self.author).values_list('id',
-                                                                     flat=True)
-        url = reverse('post_edit', args=[self.author.username,
-                                         random.choice(lst_id)])
+        last_id = Post.objects.filter(author=self.author).last()
+        url = reverse('post_edit', args=[self.author.username, last_id.id])
         response = self.authorized_client.get(url)
         form_fields = {
             'group': forms.fields.ChoiceField,
@@ -136,33 +134,24 @@ class ProjectViewsTests(TestCase):
 
     def test_post_id_correct_context(self):
         """Проверка содержимого context отдельного поста"""
-        lst_id = Post.objects.filter(author=self.author).values_list('id',
-                                                                     flat=True)
-        url = reverse('post', args=[self.author.username,
-                                    random.choice(lst_id)])
+        last_id = Post.objects.filter(author=self.author).last()
+        url = reverse('post', args=[self.author.username, last_id.id])
         response = self.authorized_client.get(url)
         post = response.context['post']
-        author = response.context['author']
-        self.assertEqual(author.first_name, 'Тестов')
-        self.assertEqual(post.text, 'Какой-то там текст')
-        self.assertEqual(post.image, post.image.name)
+        self.check_post_context(post)
 
     def test_home_page_show_correct_context(self):
         """Пост отображается на главной странице"""
         response = self.authorized_client.get(reverse('index'))
         first_object = response.context['page'][0]
-        self.assertEqual(first_object.text, 'Какой-то там текст')
-        self.assertEqual(first_object.group.title, 'Лев Толстой')
-        self.assertEqual(first_object.image, self.post.image.name)
+        self.check_post_context(first_object)
 
     def test_group_page_show_correct_context(self):
         """Пост отображается на странице группы"""
         response = self.authorized_client.get(
             reverse('group', args=[self.group.slug]))
         first_object = response.context['posts'][0]
-        self.assertEqual(first_object.text, 'Какой-то там текст')
-        self.assertEqual(first_object.group.title, 'Лев Толстой')
-        self.assertEqual(first_object.image, self.post.image.name)
+        self.check_post_context(first_object)
 
     def test_first_page_containse_ten_records(self):
         """Колличество постов на первой странице равно 10"""
@@ -254,10 +243,9 @@ class ProjectViewsTests(TestCase):
         Проверка доступа анонимного пользователя
         к редактированию поста
         """
-        lst_id = Post.objects.filter(author=self.author).values_list('id',
-                                                                     flat=True)
+        first_id = Post.objects.filter(author=self.author).first()
         url = reverse('add_comment', args=[self.author.username,
-                                           random.choice(lst_id)])
+                                           first_id.id])
         response = self.guest_client.get(url, follow=True)
         self.assertRedirects(response, '/auth/login/?next=' + url)
 
@@ -266,18 +254,18 @@ class ProjectViewsTests(TestCase):
         Проверка доступа зарегистрированного пользователя
         к добавлению комментария
         """
-        lst_id = Post.objects.filter(author=self.author).values_list('id',
-                                                                     flat=True)
-        random_url_data = random.choice(lst_id)
+        first_id = Post.objects.filter(author=self.author).first()
         form_data = {
             'text': 'Полностью разделяю позицию автора. Отличная работа!'
                     'Хорошо написано. Я бы также написал',
         }
         self.authorized_client.post(reverse('add_comment',
                                             args=[self.author.username,
-                                                  random_url_data]),
+                                                  first_id.id]),
                                     data=form_data, follow=True)
-        last_comment = \
-            Comment.objects.filter(author__username='TonyStark').order_by(
-                '-id')[0]
+        last_comment = (
+            Comment.objects.filter(author__username='TonyStark').last()
+        )
         self.assertEqual(form_data['text'], last_comment.text)
+        self.assertEqual(first_id.id, last_comment.post.id)
+        self.assertEqual(str(last_comment.author), 'TonyStark')

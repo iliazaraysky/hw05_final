@@ -23,8 +23,8 @@ class Group(models.Model):
 
 class Post(models.Model):
     text = models.TextField(verbose_name='Текст сообщения',
-                            help_text='Обязательное поле,\
-                             не должно быть пустым')
+                            help_text=('Обязательное поле,'
+                                       'не должно быть пустым'))
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
                                null=True, related_name='posts',
@@ -53,8 +53,8 @@ class Comment(models.Model):
                                verbose_name='Автор комментария',
                                help_text='Автор отображается на сайте')
     text = models.TextField(verbose_name='Текст комментария',
-                            help_text='Обязательное поле,\
-                             не должно быть пустым')
+                            help_text=('Обязательное поле,'
+                                       'не должно быть пустым'))
     created = models.DateTimeField(verbose_name='Дата публикации',
                                    help_text='Дата публикации',
                                    auto_now_add=True)
@@ -75,7 +75,7 @@ class Follow(models.Model):
                                related_name="following", verbose_name="Автора")
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=['user', 'author'],
+        constraints = (models.UniqueConstraint(fields=('user', 'author'),
                                                name='Пара уникальных значений')
-                       ]
+                       )
         verbose_name_plural = 'Пользователи / Подписки'
