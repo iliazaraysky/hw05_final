@@ -5,7 +5,6 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django import forms
 from django.conf import settings
-import random
 import tempfile
 import shutil
 
@@ -68,7 +67,6 @@ class ProjectViewsTests(TestCase):
         self.new_user = User.objects.create_user(username='TonyStark')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.new_user)
-
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон"""
