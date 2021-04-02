@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
+from http import HTTPStatus
 import random
 from posts.models import Group, Post
 
@@ -37,6 +38,26 @@ class StaticURLTests(TestCase):
         self.user = User.objects.create_user(username='testfortest')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+
+    def test_comment_url_response(self):
+        """Проверка доступности адреса для добавления комментария"""
+        first_id = Post.objects.filter(author=self.author).first()
+        response = self.guest_client.get(reverse('add_comment', args=[self.author.username, first_id.id]), follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_follow_url_response(self):
+        """Проверка доступности адреса Following пользователя"""
+        response_login_user = self.authorized_client.get(reverse('profile_follow', args=[self.author]), follow=True)
+        response_not_login_user = self.guest_client.get(reverse('profile_follow', args=[self.author]), follow=True)
+        self.assertEqual(response_login_user.status_code, HTTPStatus.OK)
+        self.assertEqual(response_not_login_user.status_code, HTTPStatus.OK)
+
+    def test_unfollow_url_response(self):
+        """Проверка доступности адреса Unfollowing пользователя"""
+        response_login_user = self.authorized_client.get(reverse('profile_unfollow', args=[self.author]), follow=True)
+        response_not_login_user = self.guest_client.get(reverse('profile_unfollow', args=[self.author]), follow=True)
+        self.assertEqual(response_login_user.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response_not_login_user.status_code, HTTPStatus.OK)
 
     def test_urls_list(self):
         """

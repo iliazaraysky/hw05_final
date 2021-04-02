@@ -37,6 +37,26 @@ class StaticURLTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
+    def test_comment_url_response(self):
+        """Проверка доступности адреса для добавления комментария"""
+        response = self.guest_client.get('/authorForPosts/4/comment/', follow=True)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_follow_url_response(self):
+        """Проверка доступности адреса Following пользователя"""
+        response_login_user = self.authorized_client.get('/authorForPosts/follow/', follow=True)
+        response_not_login_user = self.guest_client.get('/authorForPosts/follow/', follow=True)
+        self.assertEqual(response_login_user.status_code, HTTPStatus.OK)
+        self.assertEqual(response_not_login_user.status_code, HTTPStatus.OK)
+
+    def test_unfollow_url_response(self):
+        """Проверка доступности адреса Unfollowing пользователя"""
+        response_login_user = self.authorized_client.get('/authorForPosts/unfollow/', follow=True)
+        response_not_login_user = self.guest_client.get('/authorForPosts/unfollow/', follow=True)
+        self.assertEqual(response_login_user.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response_not_login_user.status_code, HTTPStatus.OK)
+
+
     def test_urls_list(self):
         """
         Тестирование по списку, для анонимного пользователя,
