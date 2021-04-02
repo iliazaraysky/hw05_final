@@ -97,9 +97,10 @@ class ProjectViewsTests(TestCase):
                 self.assertIsInstance(form_fields, expected)
 
     def check_post_context(self, post):
-        self.assertEqual(post.author.username, ProjectViewsTests.post.author.username)
+        self.assertEqual(post.author.username,
+                         ProjectViewsTests.post.author.username)
         self.assertEqual(post.text, ProjectViewsTests.post.text)
-        self.assertEqual(post.image,ProjectViewsTests.post.image)
+        self.assertEqual(post.image, ProjectViewsTests.post.image)
         self.assertEqual(str(post.group), str(ProjectViewsTests.post.group))
 
     def test_context_in_profile(self):
