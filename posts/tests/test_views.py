@@ -96,19 +96,18 @@ class ProjectViewsTests(TestCase):
                 form_fields = response.context['form'].fields[value]
                 self.assertIsInstance(form_fields, expected)
 
-    def check_post_context(self):
-        self.assertEqual(ProjectViewsTests.post.author.username,
-                         'authorForPosts')
-        self.assertEqual(ProjectViewsTests.post.text, 'Какой-то там текст')
-        self.assertEqual(ProjectViewsTests.post.image, self.post.image.name)
-        self.assertEqual(str(ProjectViewsTests.post.group), 'Лев Толстой')
+    def check_post_context(self, post):
+        self.assertEqual(post.author.username, ProjectViewsTests.post.author.username)
+        self.assertEqual(post.text, ProjectViewsTests.post.text)
+        self.assertEqual(post.image,ProjectViewsTests.post.image)
+        self.assertEqual(str(post.group), str(ProjectViewsTests.post.group))
 
     def test_context_in_profile(self):
         """Проверка содержимого словаря context для /<username>/"""
         url = reverse('profile', args=[self.author.username])
         response = self.authorized_client.get(url)
         post = response.context['page'][0]
-        self.check_post_context()
+        self.check_post_context(post)
 
     def test_context_in_post_edit(self):
         """
@@ -138,20 +137,20 @@ class ProjectViewsTests(TestCase):
         url = reverse('post', args=[self.author.username, last_id.id])
         response = self.authorized_client.get(url)
         post = response.context['post']
-        self.check_post_context()
+        self.check_post_context(post)
 
     def test_home_page_show_correct_context(self):
         """Пост отображается на главной странице"""
         response = self.authorized_client.get(reverse('index'))
         first_object = response.context['page'][0]
-        self.check_post_context()
+        self.check_post_context(first_object)
 
     def test_group_page_show_correct_context(self):
         """Пост отображается на странице группы"""
         response = self.authorized_client.get(
             reverse('group', args=[self.group.slug]))
         first_object = response.context['posts'][0]
-        self.check_post_context()
+        self.check_post_context(first_object)
 
     def test_first_page_containse_ten_records(self):
         """Колличество постов на первой странице равно 10"""
