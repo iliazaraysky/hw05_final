@@ -97,7 +97,8 @@ class ProjectViewsTests(TestCase):
                 self.assertIsInstance(form_fields, expected)
 
     def check_post_context(self):
-        self.assertEqual(ProjectViewsTests.post.author.username, 'authorForPosts')
+        self.assertEqual(ProjectViewsTests.post.author.username,
+                         'authorForPosts')
         self.assertEqual(ProjectViewsTests.post.text, 'Какой-то там текст')
         self.assertEqual(ProjectViewsTests.post.image, self.post.image.name)
         self.assertEqual(str(ProjectViewsTests.post.group), 'Лев Толстой')
